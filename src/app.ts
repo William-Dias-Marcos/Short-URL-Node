@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 
 import { env } from "./config/env";
 import { logger } from "./utils/logger";
+import { connectRedis } from "./config/redis";
 
 const app = express();
 
@@ -15,6 +16,11 @@ app.get("/health", (req: Request, res: Response) => {
     .json({ status: "ok", message: "Server is running perfectly!" });
 });
 
-app.listen(env.PORT, () => {
-  logger.success(`Server is running on port ${env.PORT}`);
-});
+const startServer = async () => {
+  await connectRedis();
+  app.listen(env.PORT, () => {
+    logger.success(`Server is running on port ${env.PORT}`);
+  });
+};
+
+startServer();
